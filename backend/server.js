@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require ("express");
 
 const {
   readTeachers,
@@ -12,174 +12,127 @@ const {
   updateStudent,
   updateTeacher,
   dbinitialize
-} = require("./database.js");
+} = require ("./database.js");
 
 const app = express();
-const bodyParser = require("body-parser");
-
+const bodyParser = require  ("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// ============== Database Initialization ==============
 app.get("/dbinitialize", async function (req, res) {
-  try {
-    console.log("DB is getting initialized");
-    let data = await dbinitialize();
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error initializing DB:", error);
-    res.status(500).json({ error: "Database initialization failed" });
-  }
+  console.log("DB is getting initialized");
+  let data = await dbinitialize();
+
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
+// ============== Teacher Related endpoints ==============
 
-// ============== Teacher Related Endpoints ==============
 app.get("/listTeachers", async function (req, res) {
-  try {
-    console.log("Request received to list teachers");
-    let data = await readTeachers();
+  console.log("Request received to list teachers");
+  let data = await readTeachers();
 
-    if (!Array.isArray(data)) {
-      throw new Error("Invalid data format");
-    }
-
-    res.status(200).json({ teachers: data });
-  } catch (error) {
-    console.error("Error fetching teachers:", error);
-    res.status(500).json({ error: "Failed to retrieve teachers" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/getTeacherInfo", async function (req, res) {
-  try {
-    let { id } = req.body;
-    if (!id) return res.status(400).json({ error: "Teacher ID is required" });
+  let reqBody = req.body;
+  console.log("Request received to get Teacher Info");
+  let data = await readTeacherInfo(reqBody.id);
 
-    console.log("Request received to get Teacher Info");
-    let data = await readTeacherInfo(id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error fetching teacher info:", error);
-    res.status(500).json({ error: "Failed to retrieve teacher information" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/addTeacher", async function (req, res) {
-  try {
-    let { id, name, age } = req.body;
-    if (!id || !name || !age)
-      return res.status(400).json({ error: "Missing required fields" });
+  let reqBody = req.body;
+  console.log(
+    "Request received to add teacher. Req body: " + JSON.stringify(reqBody)
+  );
+  let data = await addTeacher(reqBody.id, reqBody.name, reqBody.age);
 
-    console.log("Adding teacher:", req.body);
-    let data = await addTeacher(id, name, age);
-    res.status(201).json(data);
-  } catch (error) {
-    console.error("Error adding teacher:", error);
-    res.status(500).json({ error: "Failed to add teacher" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/editTeacher", async function (req, res) {
-  try {
-    let { id, name, age } = req.body;
-    if (!id || !name || !age)
-      return res.status(400).json({ error: "Missing required fields" });
+  let reqBody = req.body;
+  console.log(
+    "Request received to update teacher. Req body: " + JSON.stringify(reqBody)
+  );
+  let data = await updateTeacher(reqBody.name,reqBody.age,reqBody.id);
 
-    console.log("Updating teacher:", req.body);
-    let data = await updateTeacher(name, age, id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error updating teacher:", error);
-    res.status(500).json({ error: "Failed to update teacher" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/deleteTeacher", async function (req, res) {
-  try {
-    let { id } = req.body;
-    if (!id) return res.status(400).json({ error: "Teacher ID is required" });
+  let reqBody = req.body;
+  console.log(
+    "Request received to delete teacher. Req body: " + JSON.stringify(reqBody)
+  );
+  let data = await deleteTeacher(reqBody.id);
 
-    console.log("Deleting teacher:", id);
-    let data = await deleteTeacher(id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error deleting teacher:", error);
-    res.status(500).json({ error: "Failed to delete teacher" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
-// ============== Student Related Endpoints ==============
+// ============== Student Related endpoints ==============
+
 app.get("/listStudents", async function (req, res) {
-  try {
-    console.log("Request received to list students");
-    let data = await readStudents();
+  console.log("Request received to list students");
+  let data = await readStudents();
 
-    if (!Array.isArray(data)) {
-      throw new Error("Invalid data format");
-    }
-
-    res.status(200).json({ students: data });
-  } catch (error) {
-    console.error("Error fetching students:", error);
-    res.status(500).json({ error: "Failed to retrieve students" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/getStudentInfo", async function (req, res) {
-  try {
-    let { id } = req.body;
-    if (!id) return res.status(400).json({ error: "Student ID is required" });
+  let reqBody = req.body;
+  console.log("Request received to get Student Info");
+  let data = await readStudentInfo(reqBody.id);
 
-    console.log("Request received to get Student Info");
-    let data = await readStudentInfo(id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error fetching student info:", error);
-    res.status(500).json({ error: "Failed to retrieve student information" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/addStudent", async function (req, res) {
-  try {
-    let { id, name, age, hometown } = req.body;
-    if (!id || !name || !age || !hometown)
-      return res.status(400).json({ error: "Missing required fields" });
+  let reqBody = req.body;
+  console.log(
+    "Request received to add student. Req body: " + JSON.stringify(reqBody)
+  );
+  let data = await addStudent(
+    reqBody.id,
+    reqBody.name,
+    reqBody.age,
+    reqBody.hometown
+  );
 
-    console.log("Adding student:", req.body);
-    let data = await addStudent(id, name, age, hometown);
-    res.status(201).json(data);
-  } catch (error) {
-    console.error("Error adding student:", error);
-    res.status(500).json({ error: "Failed to add student" });
-  }
-});
-
-app.post("/editStudent", async function (req, res) {
-  try {
-    let { id, name, age, hometown } = req.body;
-    if (!id || !name || !age || !hometown)
-      return res.status(400).json({ error: "Missing required fields" });
-
-    console.log("Updating student:", req.body);
-    let data = await updateStudent(name, age, hometown, id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error updating student:", error);
-    res.status(500).json({ error: "Failed to update student" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 app.post("/deleteStudent", async function (req, res) {
-  try {
-    let { id } = req.body;
-    if (!id) return res.status(400).json({ error: "Student ID is required" });
+  let reqBody = req.body;
+  console.log(
+    "Request received to delete student. Req body: " + JSON.stringify(reqBody)
+  );
+  let data = await deleteStudent(reqBody.id);
 
-    console.log("Deleting student:", id);
-    let data = await deleteStudent(id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error deleting student:", error);
-    res.status(500).json({ error: "Failed to delete student" });
-  }
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
+});
+
+app.post("/editStudent", async function (req, res) {
+  let reqBody = req.body;
+  console.log(
+    "Request received to update Student. Req body: " + JSON.stringify(reqBody)
+  );
+  let data = await updateStudent(reqBody.name,reqBody.age,reqBody.hometown,reqBody.id);
+
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
 });
 
 module.exports = app;
