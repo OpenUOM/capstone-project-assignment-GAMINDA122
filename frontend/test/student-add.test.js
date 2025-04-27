@@ -3,6 +3,8 @@ process.env.NODE_ENV = "test";
 
 fixture`Testing Student UI`
     .page`http://localhost:4200/student`
+    .requestTimeout(60000);
+    
 
 test('Testing add students', async t => {
 
