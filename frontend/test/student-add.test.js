@@ -3,7 +3,7 @@ process.env.NODE_ENV = "test";
 
 fixture`Testing Student UI`
     .page`http://localhost:4200/student`
-    .quarantineMode(true);
+    
     
 
 test('Testing add students', async t => {
